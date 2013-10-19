@@ -1,5 +1,5 @@
-typedef struct Matrix {
+typedef struct {
     int sideLength;
     int totalSize;
-    int *point[];
+    int **points;
 } Matrix;
