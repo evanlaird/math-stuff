@@ -1,0 +1,10 @@
+Date: 2013-10-19
+Author: Evan Laird
+
+This package (ising) is here to do some cool ising model data analysis all or
+mostly in c. I have already done this in python, and aim to do some more
+low-level c programming and project structure. 
+
+Things will be glued together in Python mostly, but the core engines must be in
+C for speed considerations. I probably won't try concurrency in C. But maybe I
+will.
