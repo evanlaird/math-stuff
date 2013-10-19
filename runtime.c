@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
 
     Matrix *lattice = Matrix_create(20);
 
-    //Matrix_destroy(lattice);
+    Matrix_destroy(lattice);
 
     return 0;
 }
