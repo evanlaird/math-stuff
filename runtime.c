@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <errno.h>
 
+// contains the Matrix struct
 #include "ising_headers.h"
 
 // Default matrix size (always square)
