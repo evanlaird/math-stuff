@@ -110,9 +110,11 @@ int main(int argc, char *argv[]) {
     }
 
     // validate the inputs
-    if (start - stop < 0) {
+    if (stop - start < 0) {
         print_usage();
         die("Invalid temperatures");
     }
+    Matrix *lattice = Matrix_create(lattice_size);
+    Matrix_destroy(lattice);
     return 0;
 }
