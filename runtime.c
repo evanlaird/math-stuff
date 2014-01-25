@@ -107,6 +107,7 @@ int main(int argc, char *argv[]) {
     float   start        = 1.0;
     float   stop         = 2.0;
 
+    // getopt() is an interesting stdlib function for argparsing.
     while ((option = getopt(argc, argv, "L:J:N:t:T:")) != -1) {
         switch (option) {
             case 'L': 
