@@ -7,17 +7,10 @@
 #include <errno.h>
 
 // contains the Matrix struct
-#include "ising_headers.h"
+#include "datatypes.h"
 
-// Default matrix size (always square)
-#define  DEFAULT_LATTICE_SIZE 32
-
-// iterations before first measurement
-#define ITER_FIRST_MEASURE  5000
-// iterations between measurements
-#define ITER_MEASURE        1000
-// Total stops
-#define ITER_TOTAL          10000
+TempInfo *temps;
+Matrix *lattice;
 
 // function defines
 void die(const char *message);
@@ -25,60 +18,27 @@ void die(const char *message);
 /*
  * **************************************************************
  */
-// Matrix creation and destruction 
-Matrix *Matrix_create(int length) {
-    int i, j;
-    Matrix *mat = malloc(sizeof(Matrix));
-
-    // make sure malloc didn't fuck up
-    assert(mat != NULL);
-    if (mat == NULL) {
-        die("Failed to allocate space for matrix");
-    }
-
-    mat->sideLength = length ? length : DEFAULT_LATTICE_SIZE;
-    mat->totalSize = mat->sideLength * mat->sideLength;
-
-    // Square lattice points
-    mat->points = malloc(mat->sideLength * sizeof(int*));
-    for (i = 0; i < mat->sideLength; i++) {
-        mat->points[i] = malloc(mat->sideLength * sizeof(int));
-    }
-    for (i = 0; i < mat->sideLength; i++) {
-        for (j = 0; j < mat->sideLength; j++) {
-            mat->points[i][j] = 1;
-        }
-    }
-
-    return mat;
-}
-
-void Matrix_destroy(Matrix *lattice) {
-    assert(lattice != NULL);
-
-    free(lattice->points);
-    free(lattice);
-}
-
-void update_matrix(Matrix *lattice, int sideLength, int cpl, int N, float t, float T) {
-    // Assumes a square matrix
-    int i, j;
-
-    // Matrix iterations
-    for (i = 0; i < sideLength; i++ ) for (j = 0; j < sideLength; j++) {
-        continue;
-    }
-}
-
-/*
- * **************************************************************
- */
 // Lifetime management
 void die(const char *message) {
+    // Domain specifc, but I don't have a better way to do this...
     if (errno) {
         perror(message);
     } else {
         printf("ERROR: %s\n", message);
+    }
+
+    if (lattice) {
+        if (lattice->points) {
+            free(lattice->points);
+        }
+        free(lattice);
+    }
+
+    if (temps) {
+        if (temps->tempRange) {
+            free(temps->tempRange);
+        }
+        free(temps);
     }
 
     exit(1);
@@ -106,24 +66,28 @@ int main(int argc, char *argv[]) {
     float   coupling     = 1.0;
     float   start        = 1.0;
     float   stop         = 2.0;
+    float   t_step       = 0.1;
 
     // getopt() is an interesting stdlib function for argparsing.
-    while ((option = getopt(argc, argv, "L:J:N:t:T:")) != -1) {
+    while ((option = getopt(argc, argv, "L:J:N:t:T:S:")) != -1) {
         switch (option) {
             case 'L': 
-                lattice_size = atoi(optarg);
+                lattice_size = abs(atoi(optarg));
                 break;
             case 'J':
                 coupling = atof(optarg);
                 break;
             case 'N':
-                steps = atoi(optarg);
+                steps = abs(atoi(optarg));
                 break;
             case 't':
                 start = atof(optarg);
                 break;
             case 'T':
                 stop = atof(optarg);
+                break;
+            case 'S':
+                t_step = atof(optarg);
                 break;
             default: 
                 print_usage();
@@ -137,6 +101,11 @@ int main(int argc, char *argv[]) {
         print_usage();
         die("Invalid temperatures");
     }
+
+    // Setup structures to pass to ising_stepper
+    lattice = Matrix_create(lattice_size);
+    temps = TempInfo_create(start, stop, t_step);
+
     return 0;
 }
 
@@ -172,8 +141,8 @@ void ising_stepper(Matrix *lattice, StepInfo *stepInfo, TempInfo *tempInfo, floa
     mx[0] = my[0] = side_length - 1;
 
     // Every temp in range, for N steps, for every point
-    for (int n = 0; n < side_length; n++) {
-        for (int j = 0; j < side_length; j++) {
+        for (int n = 0; n < side_length; n++) {
+            for (int j = 0; j < side_length; j++) {
+            }
         }
-    }
 }
