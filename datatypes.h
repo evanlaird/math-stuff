@@ -1,3 +1,6 @@
+#ifndef DATATYPES_H_
+#define DATATYPES_H_
+
 // Default matrix size (always square)
 #define DEFAULT_LATTICE_SIZE 32
 // iterations before first measurement
@@ -42,3 +45,5 @@ typedef struct {
 
 // Declaring this here for now because i don't know how to structure c programs
 void die(const char *message);
+
+#endif /*DATATYPES_H_*/

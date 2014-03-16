@@ -14,7 +14,6 @@
  */
 // Matrix creation and destruction 
 Matrix *Matrix_create(int length) {
-    int i, j;
     Matrix *mat = malloc(sizeof(Matrix));
 
     // make sure malloc didn't fuck up
@@ -22,6 +21,8 @@ Matrix *Matrix_create(int length) {
     if (mat == NULL) {
         die("Failed to allocate space for matrix");
     }
+    
+    int i, j;
 
     mat->sideLength = length ? length : DEFAULT_LATTICE_SIZE;
     mat->totalSize = mat->sideLength * mat->sideLength;
@@ -72,6 +73,8 @@ TempInfo *TempInfo_create(float start, float stop, float step) {
         die ("Failed to allocate space for TempInfo");
     }
 
+    int i = 0;
+
     // Just take absolute values here, because negative temps don't make any
     // physical sense, and a negative step can be achieved via
     // backwards-traversing the data post-simulation
@@ -84,7 +87,7 @@ TempInfo *TempInfo_create(float start, float stop, float step) {
     temps->tempRange = malloc(temps->totalSteps * sizeof(float));
     // the steps-1 thing is because I always want the final temperature to be
     // the given `stop` value
-    for (int i = 0; i < temps->totalSteps - 1; i++) {
+    for (i = 0; i < temps->totalSteps - 1; i++) {
         temps->tempRange[i] = temps->start + (i * step);
     }
     temps->tempRange[temps->totalSteps] = temps->stop;

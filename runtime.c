@@ -129,7 +129,8 @@ void ising_stepper(Matrix *lattice, StepInfo *stepInfo, TempInfo *tempInfo, floa
      * Initialize the modulo arrays. p_[i] = M[i] + 1, m_[i] = M[i] - 1 wrapped
      * on a torus (because, physics)
      */
-    for (int i = 0; i < side_length; i++) {
+    int i = 0;
+    for (i = 0; i < side_length; i++) {
         px[i] = py[i] = i + 1;
         mx[i] = my[i] = i - 1;
     }
@@ -141,8 +142,9 @@ void ising_stepper(Matrix *lattice, StepInfo *stepInfo, TempInfo *tempInfo, floa
     mx[0] = my[0] = side_length - 1;
 
     // Every temp in range, for N steps, for every point
-        for (int n = 0; n < side_length; n++) {
-            for (int j = 0; j < side_length; j++) {
+    int n,j = 0;
+        for (n = 0; n < side_length; n++) {
+            for (j = 0; j < side_length; j++) {
             }
         }
 }
