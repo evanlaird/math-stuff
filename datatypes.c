@@ -24,7 +24,7 @@ Matrix *Matrix_create(int length) {
     
     int i, j;
 
-    mat->sideLength = length ? length : DEFAULT_LATTICE_SIZE;
+    mat->sideLength = length ?: DEFAULT_LATTICE_SIZE;
     mat->totalSize = mat->sideLength * mat->sideLength;
 
     // Square lattice points allocation
@@ -47,18 +47,17 @@ Matrix *Matrix_create(int length) {
 void Matrix_destroy(Matrix *lattice) {
     assert(lattice != NULL);
 
-    free(lattice->points);
+    if (lattice->points) {
+        free(lattice->points);
+    }
     free(lattice);
 }
 
-void update_matrix(Matrix *lattice, int sideLength, int cpl, int N, float t, float T) {
-    // Assumes a square matrix
-    int i, j;
+void Matrix_print(Matrix *lattice) {
+    assert(lattice != NULL);
+    assert(lattice->points != NULL);
 
-    // Matrix iterations
-    for (i = 0; i < sideLength; i++ ) for (j = 0; j < sideLength; j++) {
-        continue;
-    }
+    // Print out a user-friendly description of the matrix here, with related info
 }
 
 /*

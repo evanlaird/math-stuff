@@ -5,15 +5,11 @@
 #include <assert.h>
 #include <unistd.h>
 #include <errno.h>
-
-// contains the Matrix struct
 #include "datatypes.h"
 
+// Global state. Not great.
 TempInfo *temps;
 Matrix *lattice;
-
-// function defines
-void die(const char *message);
 
 /*
  * **************************************************************
@@ -134,17 +130,20 @@ void ising_stepper(Matrix *lattice, StepInfo *stepInfo, TempInfo *tempInfo, floa
         px[i] = py[i] = i + 1;
         mx[i] = my[i] = i - 1;
     }
-
-    // Calculate temperature range
-
-
     px[side_length] = py[side_length] = 0;
     mx[0] = my[0] = side_length - 1;
 
+    // This is the monte-carlo stepper
     // Every temp in range, for N steps, for every point
-    int n,j = 0;
-        for (n = 0; n < side_length; n++) {
-            for (j = 0; j < side_length; j++) {
+    int n,j,temp,step = 0;
+    float current_temp = 0.f;
+    for (temp = 0; temp < tempInfo->total_steps; temp++) {
+        current_temp = TempInfo->tempRange[temps];
+        for (step = 0; step < stepInfo->total_steps; step++) {
+            for (n = 0; n < side_length; n++) {
+                for (j = 0; j < side_length; j++) {
+                }
             }
         }
+    }
 }
