@@ -58,6 +58,7 @@ void Matrix_print(Matrix *lattice) {
     assert(lattice->points != NULL);
 
     // Print out a user-friendly description of the matrix here, with related info
+    //TODO:
 }
 
 /*
