@@ -13,12 +13,12 @@
 // Basic matrix definition. Probably a better way.
 // This array pointer at the end doesnt seem to work well
 typedef struct {
-    int sideLength;
-    int totalSize;
+    unsigned int sideLength;
+    unsigned int totalSize;
     char **points; // Only storing (1,0,-1) in the matrix points
 } Matrix;
 
-Matrix *Matrix_create(int length);
+Matrix *Matrix_create(unsigned int length);
 void Matrix_destroy(Matrix *lattice);
 void Matrix_print(Matrix *lattice);
 
@@ -47,5 +47,9 @@ void StepInfo_print(StepInfo *stepInfo);
 
 // Declaring this here for now because i don't know how to structure c programs
 void die(const char *message);
+
+// Generate random integers on range [-1, 1]. Not going to do this the right way on 
+// a first pass. Also, should probably put it somewhere better than here
+int random_int(); // Make sure to seed the PRNG and only once!
 
 #endif /*DATATYPES_H_*/

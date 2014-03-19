@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
-#include <time.h>
 
 #include "datatypes.h"
 
@@ -17,7 +16,7 @@ int random_int();
  * **************************************************************
  */
 // Matrix creation and destruction 
-Matrix *Matrix_create(int length) {
+Matrix *Matrix_create(unsigned int length) {
     Matrix *mat = malloc(sizeof(Matrix));
 
     // make sure malloc didn't fuck up
@@ -32,9 +31,9 @@ Matrix *Matrix_create(int length) {
     mat->totalSize = mat->sideLength * mat->sideLength;
 
     // Square lattice points allocation
-    mat->points = malloc(mat->sideLength * sizeof(int*));
+    mat->points = malloc(mat->sideLength * sizeof(char*));
     for (i = 0; i < mat->sideLength; i++) {
-        mat->points[i] = malloc(mat->sideLength * sizeof(int));
+        mat->points[i] = malloc(mat->sideLength * sizeof(char));
     }
 
     // Matrix initialization
