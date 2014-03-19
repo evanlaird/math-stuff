@@ -1,8 +1,12 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <assert.h>
 #include <math.h>
+#include <time.h>
 
 #include "datatypes.h"
+
+int random_int();
 
 /*
  * Never done this before. Going to put convenience methods defined here and
@@ -37,7 +41,7 @@ Matrix *Matrix_create(int length) {
     // FIXME: should probably randomize (1|-1)
     for (i = 0; i < mat->sideLength; i++) {
         for (j = 0; j < mat->sideLength; j++) {
-            mat->points[i][j] = 1;
+            mat->points[i][j] = random_int();
         }
     }
 
@@ -58,7 +62,19 @@ void Matrix_print(Matrix *lattice) {
     assert(lattice->points != NULL);
 
     // Print out a user-friendly description of the matrix here, with related info
-    //TODO:
+    int n, m = 0;
+    printf("(Matrix *)lattice at <%p>\n", lattice);
+    printf("{\n");
+    char zero_one_padding[] = "  ",
+         negative_one_pad[] = " ";
+    for (n = 0; n < lattice->sideLength; n++) {
+        for (m = 0; m < lattice->sideLength; m++) {
+            int point = lattice->points[n][m];
+            printf("%s%d", ((point == -1) ? negative_one_pad : zero_one_padding), point);
+        }
+        printf("\n");
+    }
+    printf("}\n");
 }
 
 /*
@@ -102,4 +118,17 @@ void TempInfo_destroy(TempInfo *temps) {
         free(temps->tempRange);
     }
     free(temps);
+}
+
+/*
+ * **************************************************************
+ */
+// Random number generation is, frankly, a pain in the ass. The rand() function
+// simply returns a uniform, probably not very good randon number on the range
+// [0, RAND_MAX], where RAND_MAX on my 64 bit mac is 2^31 - 1. Since I only care
+// about random numbers like so [-1,0,1], I'm going to cheat and just do a mod 3 - 1
+// trick here. This should be replaced by something more suitable for MC simulations
+int random_int() {
+    //TODO: make this better
+    return (rand() % 3 - 1);
 }

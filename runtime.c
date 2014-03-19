@@ -5,6 +5,7 @@
 #include <assert.h>
 #include <unistd.h>
 #include <errno.h>
+#include <time.h>
 #include "datatypes.h"
 
 // Global state. Not great.
@@ -45,6 +46,9 @@ void print_usage() {
 }
 
 int main(int argc, char *argv[]) {
+
+    // Initialize the PRNG
+    srand(time(NULL));
 
     /*
      * Command line arguments:
@@ -100,6 +104,7 @@ int main(int argc, char *argv[]) {
 
     // Setup structures to pass to ising_stepper
     lattice = Matrix_create(lattice_size);
+    Matrix_print(lattice);           
     temps = TempInfo_create(start, stop, t_step);
 
     return 0;
@@ -137,9 +142,9 @@ void ising_stepper(Matrix *lattice, StepInfo *stepInfo, TempInfo *tempInfo, floa
     // Every temp in range, for N steps, for every point
     int n,j,temp,step = 0;
     float current_temp = 0.f;
-    for (temp = 0; temp < tempInfo->total_steps; temp++) {
-        current_temp = TempInfo->tempRange[temps];
-        for (step = 0; step < stepInfo->total_steps; step++) {
+    for (temp = 0; temp < tempInfo->totalSteps; temp++) {
+        current_temp = tempInfo->tempRange[temp];
+        for (step = 0; step < stepInfo->totalSteps; step++) {
             for (n = 0; n < side_length; n++) {
                 for (j = 0; j < side_length; j++) {
                 }
