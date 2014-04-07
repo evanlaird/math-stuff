@@ -3,12 +3,12 @@
 
 // Default matrix size (always square)
 #define DEFAULT_LATTICE_SIZE 32
-// iterations before first measurement
-#define ITER_FIRST_MEASURE   5000
-// iterations between measurements
-#define ITER_MEASURE         1000
 // Total stops
 #define ITER_TOTAL           10000
+// iterations before first measurement
+#define ITER_FIRST_MEASURE   ITER_TOTAL / 2
+// iterations between measurements
+#define ITER_MEASURE         100
 
 // Basic matrix definition. Probably a better way.
 // This array pointer at the end doesnt seem to work well
