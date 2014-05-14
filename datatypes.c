@@ -15,7 +15,7 @@ int random_int();
 /*
  * **************************************************************
  */
-// Matrix creation and destruction 
+// Matrix creation and destruction
 Matrix *Matrix_create(unsigned int length) {
     Matrix *mat = malloc(sizeof(Matrix));
 
@@ -24,7 +24,7 @@ Matrix *Matrix_create(unsigned int length) {
     if (mat == NULL) {
         die("Failed to allocate space for matrix");
     }
-    
+
     int i, j;
 
     mat->sideLength = length ?: DEFAULT_LATTICE_SIZE;
@@ -51,6 +51,10 @@ void Matrix_destroy(Matrix *lattice) {
     assert(lattice != NULL);
 
     if (lattice->points) {
+        int i = 0;
+        for (i = 0; i < lattice->sideLength; i++) {
+            free(lattice->points[i]);
+        }
         free(lattice->points);
     }
     free(lattice);
@@ -85,7 +89,7 @@ TempInfo *TempInfo_create(float start, float stop, float step) {
 
     assert(temps != NULL);
     if (temps == NULL) {
-        die ("Failed to allocate space for TempInfo");
+        die("Failed to allocate space for TempInfo");
     }
 
     int i = 0;
@@ -98,15 +102,19 @@ TempInfo *TempInfo_create(float start, float stop, float step) {
     temps->step = fabs(step);
 
     // Create the tempRange array, so we can just pull values from there
-    temps->totalSteps = ceil((temps->stop - temps->stop) / temps->step);
+    temps->totalSteps = ceil((temps->stop - temps->start) / temps->step);
     temps->tempRange = malloc(temps->totalSteps * sizeof(float));
+    assert(temps->tempRange != NULL);
+    if (temps->tempRange == NULL) {
+        die("Failed to allocate space for TempInfo->tempRange");
+    }
     // the steps-1 thing is because I always want the final temperature to be
     // the given `stop` value
     for (i = 0; i < temps->totalSteps - 1; i++) {
         temps->tempRange[i] = temps->start + (i * step);
     }
-    temps->tempRange[temps->totalSteps] = temps->stop;
-    
+    temps->tempRange[temps->totalSteps-1] = temps->stop;
+
     return temps;
 }
 
@@ -119,6 +127,35 @@ void TempInfo_destroy(TempInfo *temps) {
     free(temps);
 }
 
+void TempInfo_print(TempInfo *temp) {
+    assert(temp != NULL);
+    printf("(TempInfo *)temp at <%p>\n", temp);
+    printf("start temp: %f\n", temp->start);
+    printf("stop temp:  %f\n", temp->stop);
+    printf("step size:  %f\n", temp->step);
+    printf("total steps:%d\n", temp->totalSteps);
+}
+
+/*
+ * **************************************************************
+ */
+// StepInfo creation/destruction
+StepInfo *CreateStepInfo(int totalSteps, int relaxationSteps, int loopCount)
+{
+    StepInfo *stepInfo = malloc(sizeof(StepInfo));
+    assert(stepInfo != NULL);
+    if (stepInfo == NULL) {
+        die("Failure initializing StepInfo");
+    }
+
+    stepInfo->totalSteps = totalSteps;
+    stepInfo->relaxationSteps = relaxationSteps;
+    stepInfo->loopCount = loopCount;
+
+    return stepInfo;
+}
+
+
 /*
  * **************************************************************
  */
@@ -130,4 +167,9 @@ void TempInfo_destroy(TempInfo *temps) {
 int random_int() {
     //TODO: make this better
     return (rand() % 3 - 1);
+}
+
+/// Returns a random double between [0,1]
+double drand() {
+    return (double)rand() / (double)RAND_MAX;
 }

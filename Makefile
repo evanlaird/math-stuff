@@ -1,6 +1,6 @@
 # Environment
 CC=gcc
-CFLAGS=-Wall
+CFLAGS=-Wall -O3 -lm
 
 all:ising-runner
 
