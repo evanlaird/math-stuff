@@ -1,11 +1,11 @@
 # Environment
 CC=gcc
-CFLAGS=-Wall -O3 -lm
+CFLAGS=-Wall -O0 -lm
 
 all:ising-runner
 
 ising-runner: runtime.o datatypes.o 
-	$(CC) runtime.o datatypes.o -o ising-runner -lm
+	$(CC) runtime.o datatypes.o -o ising-runner -lm -O0
 
 runtime.o: runtime.c
 	$(CC) $(CFLAGS) -c runtime.c

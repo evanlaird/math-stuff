@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     // getopt() is an interesting stdlib function for argparsing.
     while ((option = getopt(argc, argv, "L:J:N:t:T:S:")) != -1) {
         switch (option) {
-            case 'L': 
+            case 'L':
                 lattice_size = abs(atoi(optarg));
                 break;
             case 'J':
@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
             case 'S':
                 t_step = atof(optarg);
                 break;
-            default: 
+            default:
                 print_usage();
                 die(NULL);
                 break;
@@ -115,6 +115,10 @@ int main(int argc, char *argv[]) {
     // TempInfo_print(temps);
     stepInfo = CreateStepInfo(steps, ITER_FIRST_MEASURE, ITER_MEASURE);
 
+    printf("Monte-Carlo simulation of the Ising Model (2D)\n");
+    printf("\tMatrix Size: %dx%d\n", lattice_size, lattice_size);
+    printf("\tTemp Range : %.3f-%.3f\n", start, stop);
+    printf("\t# of Steps : %d\n", steps);
     ising_stepper(lattice, stepInfo, temps, coupling);
 
     Matrix_destroy(lattice);
