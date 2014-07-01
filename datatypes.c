@@ -80,6 +80,14 @@ void Matrix_print(Matrix *lattice) {
     printf("}\n");
 }
 
+double mGet(Matrix *lattice, int i, int j) {
+    if (!lattice || !lattice->points) {
+        return 0;
+    }
+
+    return lattice->points[i][j];
+}
+
 /*
  * **************************************************************
  */

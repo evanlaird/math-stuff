@@ -21,6 +21,9 @@ typedef struct {
 Matrix *Matrix_create(unsigned int length);
 void Matrix_destroy(Matrix *lattice);
 void Matrix_print(Matrix *lattice);
+// Gets the value at lattice[i][j]
+double mGet(Matrix *lattice, int i, int j);
+void mSet(Matrix *lattice, int i, int j, double val);
 
 // A nice way to package the temperature information
 // FIXME: maybe just put the temp array in here too?
