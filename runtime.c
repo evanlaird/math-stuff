@@ -6,7 +6,11 @@
 #include <unistd.h>
 #include <errno.h>
 #include <time.h>
+#include <stdbool.h>
 #include "datatypes.h"
+#include "array.h"
+
+#define BUF_SIZE 128
 
 // Global state. Not great.
 TempInfo *temps;
@@ -15,8 +19,10 @@ StepInfo *stepInfo;
 
 // Forward declares
 void configureFlippingProbabilityArray(double (*)[5], const double (*)[5], const float);
-int energyArrayIndexOfValue(double dE, const double (*)[5]);
+int energyArrayIndexOfValue(double , const double (*)[5]);
 void ising_stepper(Matrix *, StepInfo *, TempInfo *, float);
+void W_describe_in_buffer(double (*)[5], char (*)[BUF_SIZE]);
+void E_describe_in_buffer(const double (*)[5], char (*)[BUF_SIZE]);
 
 /*
  * **************************************************************
@@ -48,7 +54,7 @@ void die(const char *message) {
 }
 
 void print_usage() {
-    printf("USAGE: ./runtime -[L|N|J|t|t]");
+    printf("USAGE: ./runtime -[L|N|J|t|T]");
 }
 
 int main(int argc, char *argv[]) {
@@ -125,6 +131,7 @@ int main(int argc, char *argv[]) {
     TempInfo_destroy(temps);
     free(stepInfo);
 
+    printf("Finished\n");
     return 0;
 }
 
@@ -144,9 +151,10 @@ void ising_stepper(Matrix *lattice, StepInfo *stepInfo, TempInfo *tempInfo, floa
 
     const int side_length = lattice->sideLength;
     // Modulo look-up table (plus)
-    int px[side_length], py[side_length];
-    // (minus)
-    int mx[side_length], my[side_length];
+    int *px = array_int(side_length, true);
+    int *py = array_int(side_length, true);
+    int *mx = array_int(side_length, true);
+    int *my = array_int(side_length, true);
     /*
      * Initialize the modulo arrays. p_[i] = M[i] + 1, m_[i] = M[i] - 1 wrapped
      * on a torus (because, physics)
@@ -155,12 +163,12 @@ void ising_stepper(Matrix *lattice, StepInfo *stepInfo, TempInfo *tempInfo, floa
     for (i = 0; i < side_length; i++) {
         px[i] = py[i] = i + 1;
         mx[i] = my[i] = i - 1;
-        // printf("i:%2d  px[n]:%2d  py[j]:%2d  mx[n]:%2d  my[j]:%2d\n", i, px[i], py[i], mx[i], my[i]);
+        //printf("i:%2d  px[n]:%2d  py[j]:%2d  mx[n]:%2d  my[j]:%2d\n", i, px[i], py[i], mx[i], my[i]);
     }
     px[side_length - 1] = py[side_length - 1] = 0;
-    // printf("side_length:%2d  px[31]:%2d  py[31]:%2d\n", side_length, px[side_length - 1], py[side_length - 1]);
+    //printf("side_length:%2d  px[31]:%2d  py[31]:%2d\n", side_length, px[side_length - 1], py[side_length - 1]);
     mx[0] = my[0] = side_length - 1;
-    // printf("side_length - 1:%2d  mx[0]:%2d my[0]:%2d\n", side_length - 1, mx[0], my[0]);
+    //printf("side_length - 1:%2d  mx[0]:%2d my[0]:%2d\n", side_length - 1, mx[0], my[0]);
 
     // Since dE = 2*j*sumNeighbors*currentSpin, these are the only possible values
     // Assuming J = 1, we have 2*sumNeigh in this list
@@ -196,17 +204,17 @@ void ising_stepper(Matrix *lattice, StepInfo *stepInfo, TempInfo *tempInfo, floa
         for (step = 0; step < stepInfo->totalSteps; step++) {
             // printf("Average Energy: %f\n", Eavg);
             Eavg = 0.0;
+            //TODO: Rename n, j (wtf?) to (x,y) so I don't have a conniption
             for (n = 0; n < side_length; n++) {
                 for (j = 0; j < side_length; j++) {
-                    // printf("n:%d,  j:%d\n",n,j);
-                    // printf("n:%2d  j:%2d  px[n]:%2d  py[j]:%2d  mx[n]:%2d  my[j]:%2d\n", n, j, px[n], py[j], mx[n], my[j]);
+                    //printf("n:%d,  j:%d\n",n,j);
+                    //printf("n:%2d  j:%2d  px[n]:%2d  py[j]:%2d  mx[n]:%2d  my[j]:%2d\n", n, j, px[n], py[j], mx[n], my[j]);
                     // Calculate dE for a given spin
-                    // printf("%d\n", matrix[n][j]);
-                    dE = 2.0 * j * matrix[n][j] *   (
+                    //printf("%d\n", matrix[n][j]);
+                    dE = 2.0 * coupling * matrix[n][j] *   (
                         matrix[px[n]][j] + matrix[mx[n]][j] +
                         matrix[n][py[j]] + matrix[n][my[j]]
                     );
-                    // printf("1");
 
                     // Aggregate the value
                     Eavg = Eavg - dE;
@@ -217,6 +225,16 @@ void ising_stepper(Matrix *lattice, StepInfo *stepInfo, TempInfo *tempInfo, floa
                         // Pick a random number and see if we flip
                         int idx = energyArrayIndexOfValue(dE, &E_vals);
                         if (idx < 0 || idx >= 5) {
+                            char buffer [BUF_SIZE];
+                            E_describe_in_buffer(&E_vals, &buffer);
+                            sprintf(buffer, "\n Matrix points: %d (%d, %d, %d, %d)", \
+                                matrix[n][j],
+                                matrix[px[n]][j],
+                                matrix[mx[n]][j],
+                                matrix[n][px[j]],
+                                matrix[n][mx[j]]
+                            );
+                            printf("skipping value: dE:%f j:%f E_vals:%s\n", dE, coupling, buffer);
                             continue;
                         } else {
                             boltz = W[idx];
@@ -226,7 +244,6 @@ void ising_stepper(Matrix *lattice, StepInfo *stepInfo, TempInfo *tempInfo, floa
                             }
                         }
                     }
-                    // printf("2\n");
                 }
             }
         }
@@ -240,8 +257,18 @@ void configureFlippingProbabilityArray(double (*W)[5], const double (*E_vals)[5]
 {
     int i = 0;
     for (i = 0; i < 5; i++) {
-        *W[i] = *E_vals[i] / temp;
+        (*W)[i] = (*E_vals)[i] / temp;
     }
+}
+
+void W_describe_in_buffer(double (*W)[5], char (*buffer)[BUF_SIZE])
+{
+    sprintf(*buffer, "(%f %f %f %f %f)", (*W)[0], (*W)[1], (*W)[2], (*W)[3], (*W)[4]);
+}
+
+void E_describe_in_buffer(const double (*E)[5], char (*buffer)[BUF_SIZE])
+{
+    sprintf(*buffer, "(%f %f %f %f %f)", (*E)[0], (*E)[1], (*E)[2], (*E)[3], (*E)[4]);
 }
 
 int energyArrayIndexOfValue(double dE, const double (*E_vals)[5])
@@ -249,7 +276,7 @@ int energyArrayIndexOfValue(double dE, const double (*E_vals)[5])
     double delta = 1e-10;
     int i = 0;
     for (i = 0; i < 5; i++) {
-        if ((dE - *E_vals[i]) < delta) {
+        if ((dE - (*E_vals)[i]) < delta) {
             return i;
         }
     }
